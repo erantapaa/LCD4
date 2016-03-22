@@ -53,15 +53,35 @@ void displayKHz(uint16_t x) {
   lcd.putch('z');
 }
 
-int x = 0;
+uint16_t freq1;  // freq without CAP1
+uint16_t freq2;  // freq with CAP1
+
+const uint8_t nIterations = 50;
+
+uint8_t capFlag = 0;
+uint8_t freqIteration = nIterations;
+
+void displayCount(uint16_t count, uint8_t which) {
+  uint8_t addr = (which ? 0x40 : 0) + 0x80;
+  lcd.sendbyte(0x80+addr, 0);
+  displayKHz(count);
+}
 
 void loop() {
   init_counter1();
   delay(100);
   stop_counter1();
-  lcd.sendbyte(2, 0);
-  displayKHz(TCNT1);
+  displayCount(TCNT1, capFlag);
+  if (freqIteration > 0) {
+    freqIteration--;
+  } else {
+    capFlag = !capFlag;
+    digitalWrite(CAP1, capFlag);
+    freqIteration = nIterations;
+  }
 }
+
+int x = 0;
 
 void loop1() {
   delay(1000);
