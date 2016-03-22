@@ -36,7 +36,7 @@ void setup() {
   lcd.putch('l');
   lcd.putch('o');
   delay(1000);
-  digitalWrite(CAP1, HIGH);
+  digitalWrite(CAP1, LOW);
 }
 
 void displayKHz(uint16_t x) {
@@ -62,9 +62,24 @@ uint8_t capFlag = 0;
 uint8_t freqIteration = nIterations;
 
 void displayCount(uint16_t count, uint8_t which) {
-  uint8_t addr = (which ? 0x40 : 0) + 0x80;
+  uint8_t addr = (which ? 0x40 : 0);
   lcd.sendbyte(0x80+addr, 0);
   displayKHz(count);
+}
+
+void loop3() {
+  for (int i = 15; i >= 0; --i) {
+    lcd.sendbyte(0x80 + i, 0);
+    lcd.putch('*');
+    delay(1000);
+  }
+  for (int i = 15; i >= 0; --i) {
+    lcd.sendbyte(0x80 + 0x40 + i, 0);
+    lcd.putch('-');
+    delay(1000);
+  }
+  lcd.sendbyte(1, 0);
+  delay(2000);
 }
 
 void loop() {
